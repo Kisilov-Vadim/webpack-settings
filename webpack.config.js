@@ -1,6 +1,51 @@
 const path = require('path');
 const HTMLWebpuckPlugin = require('html-webpack-plugin');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const TerserWebpackPlugin = require('terser-webpack-plugin');
+
+const isDev = process.env.NODE_ENV === 'development';
+const isProd = !isDev;
+
+const optimization = () => {
+  let config = {
+    splitChunks: {
+      chunks: 'all'
+    }
+  }
+
+  if (isProd) {
+    config.minimizer = [
+      new OptimizeCssAssetsPlugin(),
+      new TerserWebpackPlugin()
+    ]
+  }
+
+  return config;
+}
+
+const fileName = ext => isDev ? `[name].${ext}` : `[name].[hash].${ext}`; 
+
+const cssLoaders = extra => {
+  const loaders = [
+    {
+      loader: MiniCssExtractPlugin.loader,
+      options: {
+        hmr: isDev,
+        reloadAll: true 
+      }
+    }, 
+    'css-loader'
+  ]; 
+
+  if (extra) {
+    loaders.push(extra); 
+  }
+
+  return loaders;
+}
 
 module.exports = {
   //Context - set default path for all files
@@ -11,13 +56,13 @@ module.exports = {
 
   //Entry - set entry files names
   entry: {
-    main: './index.js',
+    main: ['@babel/polyfill', './index.js'],
     analytics: './analytics.js'
   },
 
   //Output - set output files names and path
   output: {
-    filename: '[name].[contenthash].js',
+    filename: fileName('js'),
     path: path.resolve(__dirname, 'dist')
   },
 
@@ -31,47 +76,73 @@ module.exports = {
   },
 
   //Optimizations - use for libraries optimization to split same in on file
-  optimization: {
-    splitChunks: {
-      chunks: 'all'
-    }
-  },
+  optimization: optimization(),
 
   //devServer - set configuration for dev server
   devServer: {
-    port: 4200
+    port: 4200,
+    hot: true
   },
 
   //Plugins - set diff plagins for webpack
   plugins: [
     new HTMLWebpuckPlugin({
-      template: './index.html'
+      template: './index.html',
+      minify: {
+        collapseWhitespace: isProd, 
+      }
     }),
-    new CleanWebpackPlugin()
+    new CleanWebpackPlugin(),
+    new CopyWebpackPlugin({
+      patterns: [{
+        from: path.resolve(__dirname, 'src/favicon.ico'),
+        to: path.resolve(__dirname, 'dist')
+      }]
+    }),
+    new MiniCssExtractPlugin({
+      filename: fileName('css')
+    })
   ],
   
   // ADD modules - use for diff files load in js files
   module: {
     rules: [
-      {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader']
-      }, 
-      {
-        test: /\.(png|jpeg|jpg|gif|svg)$/,
-        use: ['file-loader']
+      { test: /\.css$/, use: cssLoaders() },
+      { test: /\.s[ca]ss$/, use: cssLoaders('sass-loader') },
+      { test: /\.(png|jpeg|jpg|gif|svg)$/, use: ['file-loader'] },
+      { test: /\.(ttf|woff|woff2|eot)$/, use: ['file-loader'] },
+      { test: /\.xml$/, use: ['xml-loader'] }, 
+      { test: /\.scv$/, use: ['scv-loader'] },
+      { 
+        test: /\.js$/, 
+        exclude: /node_modules/, 
+        loader: {
+          loader: 'babel-loader', 
+          options: {
+            presets: [
+              '@babel/preset-env', 
+            ],
+            plugins: [
+              '@babel/plugin-proposal-class-properties'
+            ]
+          }
+        } 
       },
-      {
-        test: /\.(ttf|woff|woff2|eot)$/,
-        use: ['file-loader']
-      },
-      {
-        test: /\.xml$/,
-        use: ['xml-loader']
-      }, 
-      {
-        test: /\.scv$/, 
-        use: ['scv-loader']
+      { 
+        test: /\.ts$/, 
+        exclude: /node_modules/, 
+        loader: {
+          loader: 'babel-loader', 
+          options: {
+            presets: [
+              '@babel/preset-env', 
+              '@babel/preset-typescript'
+            ],
+            plugins: [
+              '@babel/plugin-proposal-class-properties'
+            ]
+          }
+        } 
       }
     ]
   }

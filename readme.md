@@ -7,14 +7,20 @@
 4. if problem with webpack command in console -> use npx webpack --config webpack.config.js;
 5. Better add in package.json -> scripts ->  
   {
-    - "build": "webpack --mode production",
-    - "dev": "webpack --mode development",
-    
+    - "build": "cross-env NODE_ENV=production webpack --mode production",
+    - "dev": "cross-env NODE_ENV=development webpack --mode development",
+    - "start": "cross-env NODE_ENV=development webpack-dev-server --mode development --open",
+    - "watch": "webpack --mode production --watch"
   }
+6. npm i -D cross-env -- добавления флага в package.json прод или дев;
 
 ## Plugins: 
 1. npm i -D html-wepback-plugin -- название файлов в index.html;
 2. npm i -D clean-webpack-plugin -- очищает сбилденные файлы;
+3. npm i -D copy-webpack-plugin -- копирует нужные файлы с папки в папку; 
+4. npm install --save-dev mini-css-extract-plugin -- компилировать файлы со стилями;
+5. npm install terser-webpack-plugin --save-dev -- 
+6. npm install --save-dev optimize-css-assets-webpack-plugin -- 
 
 ## Webpack options
 1. context: ... -- set default path for all next steps; 
