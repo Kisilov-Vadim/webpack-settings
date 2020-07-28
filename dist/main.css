@@ -1,0 +1,37 @@
+@font-face {
+  font-family: 'Roboto';
+  src: url(4f39c5796e60c9d8e7327a00e9a4442e.ttf);
+}
+body {
+  margin: 0;
+  padding: 0 10%;
+}
+
+h1 {
+  width: 100%;
+  color: green;
+  background-color: white;
+  text-align: center;
+  font-family: "Roboto", sans-serif;
+}
+
+.logo {
+  width: 250px;
+  height: 250px;
+  background-image: url(2a6f90d7751ad0095482d31a8ace7833.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  margin: 0 auto;
+}
+.main {
+  width: 250px;
+  height: 250px;
+  padding: 20px;
+  background-color: black;
+}
+.main__first {
+  background-color: #ccc;
+  width: 100%;
+  height: 100%;
+}

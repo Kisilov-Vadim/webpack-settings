@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs')
 const HTMLWebpuckPlugin = require('html-webpack-plugin');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -47,6 +48,22 @@ const cssLoaders = extra => {
   return loaders;
 }
 
+const generateHtmlPlugins = (templateDir) => {
+  // Read files in template directory
+  const templateFiles = fs.readdirSync(path.resolve(__dirname, templateDir))
+  return templateFiles.map(item => {
+    // Split names and extension
+    const parts = item.split('.')
+    const name = parts[0]
+    const extension = parts[1]
+    // Create new HTMLWebpuckPlugin with options
+    return new HTMLWebpuckPlugin({
+      filename: `${name}.html`,
+      template: path.resolve(__dirname, `${templateDir}/${name}.${extension}`)
+    })
+  })
+}
+
 module.exports = {
   //Context - set default path for all files
   context: path.resolve(__dirname, 'src'), 
@@ -86,12 +103,6 @@ module.exports = {
 
   //Plugins - set diff plagins for webpack
   plugins: [
-    new HTMLWebpuckPlugin({
-      template: './index.html',
-      minify: {
-        collapseWhitespace: isProd, 
-      }
-    }),
     new CleanWebpackPlugin(),
     new CopyWebpackPlugin({
       patterns: [{
@@ -102,7 +113,7 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: fileName('css')
     })
-  ],
+  ].concat(generateHtmlPlugins('./src/views')),
   
   // ADD modules - use for diff files load in js files
   module: {
