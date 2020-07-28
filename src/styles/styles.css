@@ -1,0 +1,25 @@
+@import "fonts.css";
+@import '~normalize.css';
+
+body {
+  margin: 0;
+  padding: 0 10%;
+}
+
+h1 {
+  width: 100%;
+  color: green;
+  background-color: white;
+  text-align: center;
+  font-family: "Roboto", sans-serif;
+}
+
+.logo {
+  width: 250px;
+  height: 250px;
+  background-image: url('../assets/logo.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  margin: 0 auto;
+}
