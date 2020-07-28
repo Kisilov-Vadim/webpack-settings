@@ -9,6 +9,7 @@
   {
     - "build": "webpack --mode production",
     - "dev": "webpack --mode development",
+    
   }
 
 ## Plugins: 
